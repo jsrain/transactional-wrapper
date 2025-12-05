@@ -2,18 +2,20 @@ Transactional Wrapper
 
 Motivation:
 
-Many system tools need to modify parts of the operating system which are read-only in the immutable mode. For those, there is
-always option to call the transactional-update tool, which either provides direct subcommand for the specific tool (e.g.
-installation of packages) or provides generic subcommands to run a specific command or even start a shell.
+Many system tools need to modify parts of the operating system which are read-only in the immutable mode.
+For those, there is always option to call the transactional-update tool, which either provides direct
+subcommand for the specific tool (e.g.  installation of packages) or provides generic subcommands to run
+a specific command or even start a shell.
 
-Some existing tools already handle the immutable system ... somehow. Not really transparently, but pointing user to the
-transactional-update tool instead of failing on read-only filesystem. Prime example is zypper; based on the respective
-subcommand it either executes it directly (e.g. searching packages) or tells user to use transactional-update. What if
-there was an option that zypper executed transactional-update directly?
+Some existing tools already handle the immutable system ... somehow. Not really transparently, but pointing
+user to the transactional-update tool instead of failing on read-only filesystem. Prime example is zypper;
+based on the respective subcommand it either executes it directly (e.g. searching packages) or tells user
+to use transactional-update. What if there was an option that zypper executed transactional-update directly?
 
-This has one drawback: after transaction finishes, the new snapshot needs to be activated, which is ideally done by reboot.
-Recently, transactional-update has a feature to apply a snapshot instantly. So, the expected behavior when installing a package
-could be: zypper installs the package in new snapshot and if the operation succeeds, new snapshot gets activated automatically.
+This has one drawback: after transaction finishes, the new snapshot needs to be activated, which is
+ideally done by reboot. Recently, transactional-update has a feature to apply a snapshot instantly.
+So, the expected behavior when installing a package could be: zypper installs the package in new snapshot
+and if the operation succeeds, new snapshot gets activated automatically.
 
 
 Implemetation:
