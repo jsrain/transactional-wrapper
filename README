@@ -58,3 +58,35 @@ the behavior on successful transaction:
 - reboot immediately
 - soft-reboot immediately
 - reboot via kexec immediately
+
+
+Example patch to invoke the transactional wrapper (for zypper, not ready to apply, serving as PoC):
+
+diff --git a/src/commands/conditions.cc b/src/commands/conditions.cc
+index 56cd8b5e..b20bdfa2 100644
+--- a/src/commands/conditions.cc
++++ b/src/commands/conditions.cc
+@@ -11,6 +11,9 @@
+ #include <sys/vfs.h>
+ #include <sys/statvfs.h>
+ #include <linux/magic.h>
++#include <cstdlib>
++#include <iostream>
++
+ 
+ int NeedsRootCondition::check(std::string &err)
+ {
+@@ -44,6 +47,13 @@ int NeedsWritableRoot::check(std::string &err_r)
+       bool isTransactionalServer = ( fsinfo.f_type == BTRFS_SUPER_MAGIC && PathInfo( "/usr/sbin/transactional-update" ).isFile() );
+ 
+       if ( isTransactionalServer && !gopts.changedRoot ) {
++	#define TRANSACTIONAL_WRAPPER "/usr/sbin/transactional-wrapper"
++	#define TRANSACTIONAL_WRAPPER_CMD "/usr/sbin/transactional-wrapper -c zypper"
++	bool hasTransactionalWrapper = PathInfo( TRANSACTIONAL_WRAPPER ).isFile() ;
++        if ( hasTransactionalWrapper ) {
++          system( TRANSACTIONAL_WRAPPER_CMD );
++          return ZYPPER_EXIT_ERR_PRIVILEGES; // FIXME exit code of zypper itself
++        }
+         err_r = _("This is a transactional-server, please use transactional-update to update or modify the system.");
+       } else {
+         err_r = _("The target filesystem is mounted as read-only. Please make sure the target filesystem is writeable.");
