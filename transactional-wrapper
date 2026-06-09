@@ -1,29 +1,31 @@
 #!/bin/bash
 
 echo "Starting transactinoal-wrapper"
-ACTION="apply"
+ACTION="info"
 CMDLINE=""
+VERBOSE=0
 . /usr/etc/transactional-wrapper.conf
 [ -f /etc/transactional-wrapper.conf ] && . /etc/transactional-wrapper.conf
 
 while [[ $# -gt 0 ]] do
   case $1 in
     -c|--config)
-      echo "Loading options for command $2"
       . "/usr/share/transactional-wrapper/configs/$2"
       shift
       shift
       ;;
     -s|--success-exit-codes)
       SUCCESS_EXIT_CODES="$2"
-      echo "Setting success exit codes to $SUCCESS_EXIT_CODES"
       shift
       shift
       ;;
     -n|--noop-exit-codes)
       NOOP_EXIT_CODES="$2"
-      echo "Setting no-op exit codes to $NOOP_EXIT_CODES"
       shift
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE=1
       shift
       ;;
     -*|--*)
@@ -42,7 +44,7 @@ if [ $ENABLE_TRANSACTIONAL_WRAPPER == "0" ] ; then
 fi
 
 test -z "$CMDLINE" && CMDLINE=`cat "/proc/$PPID/cmdline" | tr '\000' ' '`
-echo "Calling transactional-wrapper for $CMDLINE"
+$VERBOSE && echo "Calling transactional-wrapper for $CMDLINE"
 
 tempfile=$(mktemp)
 /sbin/transactional-update run $CMDLINE | tee $tempfile
@@ -59,14 +61,17 @@ if echo $NOOP_EXIT_CODES | grep $WRAPPED_EXIT ; then
 fi
 
 if echo $SUCCESS_EXIT_CODES | grep $WRAPPED_EXIT ; then
-  echo "Transaction succeeded with exit code $EXIT"
+  $VERBOSE && echo "Transaction succeeded with exit code $EXIT"
 else
   echo "Execution of transaction failed with exit code $EXIT"
   exit $EXIT
 fi
 
-if [ $ACTION = "nothing" ] ; then
-  echo "Skipping any operation to activate new snapshot"
+if [ $ACTION = "info" ] ; then
+  echo "New snapshot has been created. Reboot as soon as possible"
+  echo "To activate it. Until new snapshot is activated, further"
+  echo "operations will be based on currently running snapshot"
+  echo "and further snapshots will not include the changes."
   exit $EXIT
 fi
 
@@ -92,7 +97,7 @@ if [ $ACTION = "kexec" ] ; then
 fi
 
 if [ $ACTION = "apply" ] ; then
-  echo "Applying new snapshot"
+  echo "Applying new snapshot via transactinal-update apply"
   /sbin/transactional-update apply;
   exit $EXIT
 fi
