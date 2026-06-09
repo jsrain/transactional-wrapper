@@ -23,16 +23,19 @@ Group:          System/Base
 Version:        0.0.1
 Release:        0
 BuildArch:      noarch
-Url:		https://github.com/jsrain/transactional-wrapper/
-Requires:	transactional-update
+Url:            https://github.com/jsrain/transactional-wrapper/
+Requires:       transactional-update
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-Source0:	transactional-wrapper
-Source1:	transactional-alias
-Source2:	transactional-wrapper.conf
-Source3:	README
-Source100:	zypper
+Source0:        transactional-wrapper
+Source1:        transactional-alias
+Source2:        transactional-wrapper.conf
+Source3:        README
+Source100:      zypper
+
+%define with_alias 0
+%define with_configs 0
 
 
 %description
@@ -44,32 +47,32 @@ Generic wrapper for calling commands which need to run in transactional update t
 
 %install
 mkdir -p %{buildroot}/usr/sbin
-mkdir -p %{buildroot}/usr/etc
+mkdir -p %{buildroot}/%{_prefix}/etc
 install -m 755 %{SOURCE0} %{buildroot}/usr/sbin/transactional-wrapper
 %if 0%{?with_alias}
 install -m 755 %{SOURCE1} %{buildroot}/usr/sbin/transactional-alias
 %endif
-install -m 644 %{SOURCE2} %{buildroot}/usr/etc/transactional-wrapper.conf
-mkdir -p %{buildroot}/usr/share/doc/packages/transactional-wrapper
-install -m 644 %{SOURCE3} %{buildroot}/usr/share/doc/packages/transactional-wrapper/README
-mkdir -p %{buildroot}/usr/share/transactional-wrapper/configs
+install -m 644 %{SOURCE2} %{buildroot}%{_prefix}/etc/transactional-wrapper.conf
+mkdir -p %{buildroot}%{_datadir}/doc/packages/transactional-wrapper
+install -m 644 %{SOURCE3} %{buildroot}/%{_datadir}/doc/packages/transactional-wrapper/README
+mkdir -p %{buildroot}/%{_datadir}/transactional-wrapper/configs
 %if 0%{?with_configs}
-install -m 644 %{SOURCE100} %{buildroot}/usr/share/transactional-wrapper/configs/zypper
+install -m 644 %{SOURCE100} %{buildroot}/%{_datadir}/transactional-wrapper/configs/zypper
 %endif
 
 %files
 %defattr(644,root,root,755)
-%dir /usr/share/doc/packages/transactional-wrapper
-%dir /usr/share/transactional-wrapper
+%dir %{_datadir}/doc/packages/transactional-wrapper
+%dir %{_datadir}/transactional-wrapper
 %attr(755, root, root) /usr/sbin/transactional-wrapper
 %if 0%{?with_alias}
 %attr(755, root, root) /usr/sbin/transactional-alias
 %endif
-/usr/etc/transactional-wrapper.conf
-/usr/share/doc/packages/transactional-wrapper/README
-%dir /usr/share/transactional-wrapper/configs
+%{_prefix}/etc/transactional-wrapper.conf
+%{_datadir}/doc/packages/transactional-wrapper/README
+%dir %{_datadir}/transactional-wrapper/configs
 %if 0%{?with_configs}
-/usr/share/transactional-wrapper/configs/zypper
+%{_datadir}/transactional-wrapper/configs/zypper
 %endif
 
 %changelog
