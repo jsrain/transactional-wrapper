@@ -44,7 +44,7 @@ if [ $ENABLE_TRANSACTIONAL_WRAPPER == "0" ] ; then
 fi
 
 test -z "$CMDLINE" && CMDLINE=`cat "/proc/$PPID/cmdline" | tr '\000' ' '`
-$VERBOSE && echo "Calling transactional-wrapper for $CMDLINE"
+[ $VERBOSE = "1" ] && echo "Calling transactional-wrapper for $CMDLINE"
 
 tempfile=$(mktemp)
 /sbin/transactional-update run $CMDLINE | tee $tempfile
@@ -61,7 +61,7 @@ if echo $NOOP_EXIT_CODES | grep $WRAPPED_EXIT ; then
 fi
 
 if echo $SUCCESS_EXIT_CODES | grep $WRAPPED_EXIT ; then
-  $VERBOSE && echo "Transaction succeeded with exit code $EXIT"
+  [ $VERBOSE = "1" ] && echo "Transaction succeeded with exit code $EXIT"
 else
   echo "Execution of transaction failed with exit code $EXIT"
   exit $EXIT
