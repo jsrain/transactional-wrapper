@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting transactinoal-wrapper"
+echo "Starting transactional-wrapper"
 ACTION="info"
 CMDLINE=""
 VERBOSE=0
@@ -76,28 +76,28 @@ if [ $ACTION = "info" ] ; then
 fi
 
 if [ $ACTION = "soft-reboot" ] ; then
-  echo "Soft-rebooting to acticate the snapshot in 10 secinds"
+  echo "Soft-rebooting to activate the snapshot in 10 seconds"
   echo "Interrupt the script to interrupt system restart"
   sleep 10
   systemctl soft-reboot
 fi
 
 if [ $ACTION = "reboot" ] ; then
-  echo "Rebooting to acticate the snapshot in 10 secinds"
+  echo "Rebooting to activate the snapshot in 10 seconds"
   echo "Interrupt the script to interrupt system restart"
   sleep 10
   systemctl reboot
 fi
 
 if [ $ACTION = "kexec" ] ; then
-  echo "Rebooting via kexec to acticate the snapshot in 10 secinds"
+  echo "Rebooting via kexec to activate the snapshot in 10 seconds"
   echo "Interrupt the script to interrupt system restart"
   sleep 10
   systemctl kexec
 fi
 
 if [ $ACTION = "apply" ] ; then
-  echo "Applying new snapshot via transactinal-update apply"
+  echo "Applying new snapshot via transactional-update apply"
   /sbin/transactional-update apply;
   exit $EXIT
 fi
