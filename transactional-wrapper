@@ -7,7 +7,7 @@ VERBOSE=0
 . /usr/etc/transactional-wrapper.conf
 [ -f /etc/transactional-wrapper.conf ] && . /etc/transactional-wrapper.conf
 
-while [[ $# -gt 0 ]] do
+while [[ $# -gt 0 ]]; do
   case $1 in
     -c|--config)
       . "/usr/share/transactional-wrapper/configs/$2"
@@ -48,7 +48,7 @@ test -z "$CMDLINE" && CMDLINE=`cat "/proc/$PPID/cmdline" | tr '\000' ' '`
 
 tempfile=$(mktemp)
 /sbin/transactional-update run $CMDLINE | tee $tempfile
-EXIT=`sed -n 's/.*Application returned with exit status //p' <$tempfile |sed 's/\.$//i'`
+EXIT=`sed -n 's/.*Application returned with exit status //p' <$tempfile |sed 's/\.$//'`
 rm $tempfile
 
 WRAPPED_EXIT=",$EXIT,"
@@ -73,30 +73,22 @@ if [ $ACTION = "info" ] ; then
   echo "operations will be based on currently running snapshot"
   echo "and further snapshots will not include the changes."
   exit $EXIT
-fi
-
-if [ $ACTION = "soft-reboot" ] ; then
+elif [ $ACTION = "soft-reboot" ] ; then
   echo "Soft-rebooting to activate the snapshot in 10 seconds"
   echo "Interrupt the script to interrupt system restart"
   sleep 10
   systemctl soft-reboot
-fi
-
-if [ $ACTION = "reboot" ] ; then
+elif [ $ACTION = "reboot" ] ; then
   echo "Rebooting to activate the snapshot in 10 seconds"
   echo "Interrupt the script to interrupt system restart"
   sleep 10
   systemctl reboot
-fi
-
-if [ $ACTION = "kexec" ] ; then
+elif [ $ACTION = "kexec" ] ; then
   echo "Rebooting via kexec to activate the snapshot in 10 seconds"
   echo "Interrupt the script to interrupt system restart"
   sleep 10
   systemctl kexec
-fi
-
-if [ $ACTION = "apply" ] ; then
+elif [ $ACTION = "apply" ] ; then
   echo "Applying new snapshot via transactional-update apply"
   /sbin/transactional-update apply;
   exit $EXIT
